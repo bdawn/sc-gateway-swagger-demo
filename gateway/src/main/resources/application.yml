@@ -1,0 +1,48 @@
+
+eureka:
+    instance:
+        prefer-ip-address: true
+        ip-address: 127.0.0.1
+    client:
+        serviceUrl:
+            defaultZone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/
+
+spring:
+    application:
+        name: gateway
+    cloud:
+        gateway:
+          locator:
+            enabled: true
+          routes:
+          # 暂时无法从网关获取swagger ui，所以在这里配置，从其中一个服务获取swagger
+          - id: swagger-1
+            uri: lb://server-f
+            predicates:
+              - Path=/swagger-ui.html
+          # 从其中一个服务获取swagger ui用到的资源文件
+          - id: swagger-2
+            uri: lb://server-f
+            predicates:
+              - Path=/webjars/springfox-swagger-ui/**
+          - id: server-f
+            uri: lb://server-f
+            predicates:
+            - Path=/server-f/**
+            filters:
+            - SwaggerHeaderFilter
+            - StripPrefix=1
+          - id: server-s
+            uri: lb://server-s
+            predicates:
+            - Path=/server-s/**
+            filters:
+            - SwaggerHeaderFilter
+            - StripPrefix=1
+          x-forwarded:
+            prefix-append: false
+
+
+server:
+  port: 8083
+

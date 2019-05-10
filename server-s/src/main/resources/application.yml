@@ -1,0 +1,18 @@
+
+
+
+eureka:
+    instance:
+        # docker 部署开启
+        prefer-ip-address: true
+        ip-address: 127.0.0.1
+    client:
+        serviceUrl:
+#            defaultZone: http://localhost:8761/eureka/
+                    # docker 部署开启
+            defaultZone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/
+spring:
+  application:
+    name: server-s
+server:
+  port: 8082
